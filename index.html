@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TR Executive Portal</title>
+    <style>
+        /* LOGIN/SIGNUP STYLES (UNCHANGED) */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+        .page {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+        .auth-container {
+            width: 350px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .auth-container h1 {
+            text-align: center;
+        }
+        .auth-container input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .auth-container button {
+            width: 100%;
+            padding: 14px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+        .switch-auth {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        /* ENHANCED DASHBOARD STYLES */
+        .dashboard {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        .sidebar {
+            background: #263238;
+            color: white;
+            padding: 20px;
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .sidebar-logo {
+            font-size: 20px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .nav-item {
+            padding: 12px 15px;
+            margin: 5px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background: #f5f7fa;
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+            margin-left: 15px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            padding: 20px;
+            border-radius: 8px;
+            color: white;
+        }
+        .metric-card h3 {
+            margin-top: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .metric-card .value {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        .metric-card .change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .table th {
+            font-weight: 500;
+            color: #666;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-warning {
+            background: #fff8e1;
+            color: #ff8f00;
+        }
+        .status-danger {
+            background: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN PAGE (UNCHANGED) -->
+    <div id="login-page" class="page active">
+        <div class="auth-container">
+            <h1>Login</h1>
+            <form id="login-form">
+                <input type="email" placeholder="Email" id="login-email" required>
+                <input type="password" placeholder="Password" id="login-password" required>
+                <div id="login-error" class="error"></div>
+                <button type="submit">Login</button>
+            </form>
+            <div class="switch-auth">
+                New user? <a href="#" onclick="showPage('signup-page')">Sign up</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIGNUP PAGE (UNCHANGED) -->
+    <div id="signup-page" class="page">
+        <div class="auth-container">
+            <h1>Sign Up</h1>
+            <form id="signup-form">
+                <input type="email" placeholder="Email" name="data[email]" required>
+                <input type="password" placeholder="Password" name="data[password]" required>
+                <input type="password" placeholder="Repeat Password" name="data[password_repeat]" required>
+                <div id="signup-error" class="error"></div>
+                <button type="submit">Sign Up</button>
+            </form>
+            <div class="switch-auth">
+                Already have an account? <a href="#" onclick="showPage('login-page')">Login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENHANCED DASHBOARD PAGE -->
+    <div id="dashboard-page" class="page">
+        <div class="dashboard">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">TR GROUP</div>
+                </div>
+                
+                <div class="nav-menu">
+                    <div class="nav-item active">
+                        <i>📊</i> Dashboard
+                    </div>
+                    <div class="nav-item">
+                        <i>📈</i> Analytics
+                    </div>
+                    <div class="nav-item">
+                        <i>💼</i> Projects
+                    </div>
+                    <div class="nav-item">
+                        <i>👥</i> Team
+                    </div>
+                    <div class="nav-item">
+                        <i>💰</i> Finances
+                    </div>
+                    <div class="nav-item">
+                        <i>⚙️</i> Settings
+                    </div>
+                </div>
+                
+                <div style="margin-top: 40px;">
+                    <div class="nav-item" onclick="logout()">
+                        <i>🚪</i> Logout
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="header">
+                    <h1>Executive Dashboard</h1>
+                    <div class="user-menu">
+                        <span>Tumelo Raseropo</span>
+                        <div class="avatar"></div>
+                    </div>
+                </div>
+                
+                <!-- Metrics Overview -->
+                <div class="metrics-grid">
+                    <div class="metric-card" style="background: #4285F4;">
+                        <h3>TOTAL REVENUE</h3>
+                        <div class="value">R 452,800</div>
+                        <div class="change">↑ 12.5% from last month</div>
+                    </div>
+                    <div class="metric-card" style="background: #34A853;">
+                        <h3>PROFIT MARGIN</h3>
+                        <div class="value">32.6%</div>
+                        <div class="change">↑ 2.4% from last month</div>
+                    </div>
+                    <div class="metric-card" style="background: #EA4335;">
+                        <h3>OPERATING COSTS</h3>
+                        <div class="value">R 148,200</div>
+                        <div class="change">↓ 5.1% from last month</div>
+                    </div>
+                </div>
+                
+                <!-- Business Units Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Business Unit Performance</div>
+                        <select style="padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                            <option>Last 30 Days</option>
+                            <option>Last Quarter</option>
+                            <option>Last Year</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <!-- Chart would go here -->
+                        <div style="background: #f9f9f9; height: 100%; display: flex; justify-content: center; align-items: center; color: #999;">
+                            [Performance Chart Visualization]
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <!-- Recent Transactions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Recent Transactions</div>
+                            <button style="background: none; border: none; color: #4285F4; cursor: pointer;">View All</button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>May 28</td>
+                                    <td>AFGRI Maize Delivery</td>
+                                    <td style="color: #34A853;">+R 142,800</td>
+                                </tr>
+                                <tr>
+                                    <td>May 25</td>
+                                    <td>JHB Market Produce</td>
+                                    <td style="color: #34A853;">+R 28,450</td>
+                                </tr>
+                                <tr>
+                                    <td>May 22</td>
+                                    <td>Luscious Allure Sales</td>
+                                    <td style="color: #34A853;">+R 12,500</td>
+                                </tr>
+                                <tr>
+                                    <td>May 20</td>
+                                    <td>Equipment Maintenance</td>
+                                    <td style="color: #EA4335;">-R 8,200</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Team Activity -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Team Activity</div>
+                        </div>
+                        <div style="display: flex; margin-bottom: 15px; align-items: center;">
+                            <div style="width: 40px; height: 40px; background: #f0f0f0; border-radius: 50%; margin-right: 15px;"></div>
+                            <div>
+                                <div style="font-weight: 500;">Lerato Mokoena</div>
+                                <div style="font-size: 13px; color: #666;">Updated 12 farmer contracts</div>
+                                <span class="status-badge status-success">Completed</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; margin-bottom: 15px; align-items: center;">
+                            <div style="width: 40px; height: 40px; background: #f0f0f0; border-radius: 50%; margin-right: 15px;"></div>
+                            <div>
+                                <div style="font-weight: 500;">James Peterson</div>
+                                <div style="font-size: 13px; color: #666;">Recruited 3 new agents</div>
+                                <span class="status-badge status-success">Completed</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; margin-bottom: 15px; align-items: center;">
+                            <div style="width: 40px; height: 40px; background: #f0f0f0; border-radius: 50%; margin-right: 15px;"></div>
+                            <div>
+                                <div style="font-weight: 500;">Thando Nkosi</div>
+                                <div style="font-size: 13px; color: #666;">Preparing Q2 financial report</div>
+                                <span class="status-badge status-warning">In Progress</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Projects Overview -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Active Projects</div>
+                        <button style="background: #4285F4; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">+ Add Project</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Business Unit</th>
+                                <th>Lead</th>
+                                <th>Timeline</th>
+                                <th>Status</th>
+                                <th>Budget</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Luscious Allure Expansion</td>
+                                <td>Luxury Goods</td>
+                                <td>Tumelo R.</td>
+                                <td>May 1 - Aug 30</td>
+                                <td><span class="status-badge status-success">On Track</span></td>
+                                <td>R 250,000</td>
+                            </tr>
+                            <tr>
+                                <td>Farm Equipment Upgrade</td>
+                                <td>SJ Solutions</td>
+                                <td>Lerato M.</td>
+                                <td>Apr 15 - Jul 15</td>
+                                <td><span class="status-badge status-warning">Delayed</span></td>
+                                <td>R 180,000</td>
+                            </tr>
+                            <tr>
+                                <td>Export Market Development</td>
+                                <td>Raseropo Fresh</td>
+                                <td>James P.</td>
+                                <td>Jun 1 - Dec 31</td>
+                                <td><span class="status-badge status-success">On Track</span></td>
+                                <td>R 320,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Page navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Login functionality (unchanged)
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (email && password) {
+                showPage('dashboard-page');
+            } else {
+                document.getElementById('login-error').textContent = "Please enter email and password";
+            }
+        });
+
+        // Signup functionality (unchanged)
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = document.querySelector('input[name="data[password]"]').value;
+            const passwordRepeat = document.querySelector('input[name="data[password_repeat]"]').value;
+            
+            if (password !== passwordRepeat) {
+                document.getElementById('signup-error').textContent = "Passwords don't match!";
+                return;
+            }
+            
+            document.getElementById('signup-error').textContent = "";
+            alert("Account created successfully!");
+            showPage('login-page');
+        });
+
+        // Logout functionality
+        function logout() {
+            showPage('login-page');
+            document.getElementById('login-form').reset();
+        }
+
+        // Initialize to login page
+        showPage('login-page');
+    </script>
+</body>
+</html>
